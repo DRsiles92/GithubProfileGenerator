@@ -3,6 +3,8 @@ const axios = require("axios");
 const inquirer = require("inquirer");
 const util = require("util");
 var pdf = require('html-pdf');
+var html = fs.readFileSync('./message.html', 'utf8');
+var options = { format: 'Letter' };
 
 const readFileAsync = util.promisify(fs.readFile);
 
@@ -24,11 +26,10 @@ inquirer
   .then(function({username, colorChoices}) {
     const queryUrl = `https://api.github.com/users/${username}`;
     
-    console.log(colorChoices);
     axios.get(queryUrl).then(function(response) {
       // User name
       const name = response.data.name;
-      console.log(name);
+      // console.log(name);
       fs.writeFile('message.html', `<!DOCTYPE html>
       <html>
           <head>
@@ -46,7 +47,7 @@ inquirer
               <br>
               Repo URL: <a href="`+response.data.html_url+`">`+username+`</a>
               <br>
-              Public Repos:`+ response.data.public_repos +` 
+              Public Repos: `+ response.data.public_repos +` 
               <br>
               Followers: `+ response.data.followers +`
               <br>
@@ -78,15 +79,13 @@ inquirer
       //   console.log(response.data.followers);
       //   // Number of users following
       //   console.log(response.data.following);
+      var dateRan = Date.now();
+      console.log(dateRan);
       
     });
     
   });
-  var html = fs.readFileSync('./message.html', 'utf8');
-  var options = { format: 'Letter' };
-  
+  //Converts HTML to PDF
   pdf.create(html, options).toFile('./businesscard.pdf', function(err, res) {
     if (err) return console.log(err);
-    console.log(res); // { filename: '/app/businesscard.pdf' }
-  });
-    
+});
